@@ -6,6 +6,7 @@ import sys, os, time
 
 from rtime_ext import scoped_getrusage
 
+
 class TestTime(BaseRtypingTest):
     def test_getrusage(self):
         def does_noting():
@@ -54,7 +55,9 @@ class TestTime(BaseRtypingTest):
             for x in arr:
                 r += x
             return r
+
         with scoped_getrusage() as t:
             long_loop(10000000)
+
         print t.end_utime - t.start_utime
         print t.end_stime - t.start_stime

@@ -26,5 +26,6 @@ def _make_with_scoped_timer():
 
     return ScopedTimer()
 
+
 def scoped_getrusage():
     return _make_with_scoped_timer()

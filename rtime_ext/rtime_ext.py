@@ -29,3 +29,9 @@ def _make_with_scoped_timer():
 
 def scoped_getrusage():
     return _make_with_scoped_timer()
+
+
+def fn_with_getrusage(func, *args, **kwargs):
+    with scoped_getrusage() as t:
+        func(*args, **kwargs)
+    return t

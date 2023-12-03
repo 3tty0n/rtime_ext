@@ -11,7 +11,7 @@ from rpython.rlib.rtime import (
 from rpython.rtyper.lltypesystem import rffi, lltype
 
 
-def _make_with_scoped_timer():
+def _make_with_scoped_getrusage():
     class ScopedTimer:
         def __init__(self):
             # TODO: improve accuracy
@@ -37,7 +37,7 @@ def _make_with_scoped_timer():
 
 
 def scoped_getrusage():
-    return _make_with_scoped_timer()
+    return _make_with_scoped_getrusage()
 
 
 def clock_monotonic():

@@ -1,4 +1,13 @@
-from rpython.rlib.rtime import decode_timeval, c_getrusage, RUSAGE_SELF, RUSAGE
+from rpython.rlib.rtime import (
+    decode_timeval,
+    c_getrusage,
+    c_clock_gettime,
+    RUSAGE_SELF,
+    RUSAGE,
+    HAS_CLOCK_GETTIME,
+    CLOCK_MONOTONIC,
+    TIMESPEC,
+)
 from rpython.rtyper.lltypesystem import rffi, lltype
 
 
@@ -31,7 +40,15 @@ def scoped_getrusage():
     return _make_with_scoped_timer()
 
 
-def fn_with_getrusage(func, *args, **kwargs):
-    with scoped_getrusage() as t:
-        func(*args, **kwargs)
-    return t
+def clock_monotonic():
+    if HAS_CLOCK_GETTIME:
+        with lltype.scoped_alloc(TIMESPEC) as a:
+            if c_clock_gettime(CLOCK_MONOTONIC, a) == 0:
+                return (
+                    float(rffi.getintfield(a, "c_tv_sec"))
+                    + float(rffi.getintfield(a, "c_tv_nsec")) * 0.000000001
+                )
+    with lltype.scoped_alloc(RUSAGE) as a:
+        c_getrusage(RUSAGE_SELF, a)
+        result = decode_timeval(a.c_ru_utime) + decode_timeval(a.c_ru_stime)
+    return result

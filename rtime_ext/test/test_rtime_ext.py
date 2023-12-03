@@ -4,7 +4,7 @@ from rpython.rlib import rtime
 
 import sys, os, time
 
-from rtime_ext import scoped_getrusage, fn_with_getrusage
+from rtime_ext import scoped_getrusage, clock_monotonic
 
 
 class TestTime(BaseRtypingTest):
@@ -62,17 +62,8 @@ class TestTime(BaseRtypingTest):
         print "user ", t.end_utime - t.start_utime
         print "system ", t.end_stime - t.start_stime
 
-    def test_fn_with_getrusage(self):
-        def long_loop(n):
-            arr = [i for i in range(n)]
-            r = 0
-            for x in arr:
-                r += x
-            return r
-
-        t = fn_with_getrusage(long_loop, 10000)
-        assert hasattr(t, "start_utime")
-        assert hasattr(t, "start_stime")
-        assert hasattr(t, "end_utime")
-        assert hasattr(t, "end_stime")
-        print t.end_utime - t.start_utime
+    def test_clock_monotonic(self):
+        s = clock_monotonic()
+        rtime.sleep(0.19)
+        e = clock_monotonic()
+        assert 0.19 <= e - s

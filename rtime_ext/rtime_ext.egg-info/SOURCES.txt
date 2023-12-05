@@ -1,7 +1,0 @@
-README.md
-pyproject.toml
-setup.py
-rtime_ext/rtime_ext.egg-info/PKG-INFO
-rtime_ext/rtime_ext.egg-info/SOURCES.txt
-rtime_ext/rtime_ext.egg-info/dependency_links.txt
-rtime_ext/rtime_ext.egg-info/top_level.txt

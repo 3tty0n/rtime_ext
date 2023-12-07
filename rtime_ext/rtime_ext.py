@@ -1,7 +1,9 @@
 from rpython.rlib.rtime import (
     decode_timeval,
+    external,
     c_getrusage,
     c_clock_gettime,
+    CConfigForClockGetTime,
     RUSAGE_SELF,
     RUSAGE,
     HAS_CLOCK_GETTIME,
@@ -9,6 +11,14 @@ from rpython.rlib.rtime import (
     TIMESPEC,
 )
 from rpython.rtyper.lltypesystem import rffi, lltype
+
+if HAS_CLOCK_GETTIME:
+    eciclock = CConfigForClockGetTime._compilation_info_
+    c_clock_gettime_monotonic = external('clock_gettime',
+                                         [lltype.Signed, lltype.Ptr(TIMESPEC)],
+                                         rffi.INT, releasegil=False,
+                                         save_err=rffi.RFFI_SAVE_ERRNO,
+                                         compilation_info=eciclock)
 
 
 def _make_with_scoped_getrusage():
@@ -43,7 +53,7 @@ def scoped_getrusage():
 def clock_monotonic():
     if HAS_CLOCK_GETTIME:
         with lltype.scoped_alloc(TIMESPEC) as a:
-            if c_clock_gettime(CLOCK_MONOTONIC, a) == 0:
+            if c_clock_gettime_monotonic(CLOCK_MONOTONIC, a) == 0:
                 return (
                     float(rffi.getintfield(a, "c_tv_sec"))
                     + float(rffi.getintfield(a, "c_tv_nsec")) * 0.000000001
